@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的生活助手 | 太原理工大学</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+        }
+
+        /* 动态波浪背景 */
+        .wave-bg {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 200px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,186.7C960,213,1056,235,1152,218.7C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+            animation: wave 15s linear infinite;
+        }
+
+        .wave:nth-child(2) {
+            bottom: 10px;
+            opacity: 0.5;
+            animation: wave 12s linear infinite reverse;
+        }
+
+        .wave:nth-child(3) {
+            bottom: 20px;
+            opacity: 0.3;
+            animation: wave 20s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* 浮动圆圈装饰 */
+        .floating-circles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: floatCircle 20s infinite ease-in-out;
+        }
+
+        @keyframes floatCircle {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 渐变按钮 */
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-gradient:active {
+            transform: scale(0.98);
+        }
+
+        /* B站粉色按钮 */
+        .btn-bilibili {
+            background: linear-gradient(135deg, #fb7299 0%, #fc8bab 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-bilibili:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(251, 114, 153, 0.4);
+        }
+
+        /* 输入框样式 */
+        .input-modern {
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .input-modern:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        /* 自定义复选框 */
+        .checkbox-modern {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-modern:checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+
+        .checkbox-modern:checked::after {
+            content: '✓';
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* 任务项动画 */
+        .task-item {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* 删除按钮 */
+        .delete-btn {
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .delete-btn { opacity: 1; }
+        }
+
+        /* 导航标签 */
+        .nav-tab {
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* 内容区域 */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 娱乐卡片 */
+        .entertainment-card {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .entertainment-card:hover {
+            transform: scale(1.03);
+        }
+
+        .entertainment-card img {
+            transition: transform 0.5s ease;
+        }
+
+        .entertainment-card:hover img {
+            transform: scale(1.1);
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 100%;
+            animation: progressShine 2s linear infinite;
+        }
+
+        @keyframes progressShine {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        /* 名言卡片 */
+        .quote-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        /* emoji动画 */
+        .emoji-float {
+            animation: emojiFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes emojiFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- 波浪背景 -->
+    <div class="wave-bg">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
+    <!-- 浮动圆圈 -->
+    <div class="floating-circles" id="circles"></div>
+
+    <!-- 顶部导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl emoji-float">🌈</span>
+                    <span class="font-bold text-gray-800 text-lg">我的生活助手</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="https://www.tyut.edu.cn" target="_blank" 
+                       class="flex items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-medium hover:shadow-lg transition-all">
+                        <span>🏫</span>
+                        <span class="hidden sm:inline">太原理工大学</span>
+                        <span class="sm:hidden">TYUT</span>
+                    </a>
+                    <a href="https://www.bilibili.com" target="_blank" 
+                       class="flex items-center gap-1 btn-bilibili text-white px-3 py-1.5 rounded-full text-xs font-medium">
+                        <span>📺</span>
+                        <span class="hidden sm:inline">哔哩哔哩</span>
+                        <span class="sm:hidden">B站</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="relative z-10 px-4 pt-20 pb-24">
+        <!-- 欢迎区域 -->
+        <header class="text-center mb-6 pt-4">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
+                <span class="emoji-float inline-block">✨</span>
+                今天也要加油鸭
+                <span class="emoji-float inline-block" style="animation-delay: 0.5s;">✨</span>
+            </h1>
+            <p class="text-white/90 text-base sm:text-lg" id="greeting">早上好！新的一天开始啦~</p>
+            <div class="mt-2 text-white/70 text-sm" id="dateTime"></div>
+        </header>
+
+        <!-- 导航标签 -->
+        <div class="max-w-2xl mx-auto mb-6">
+            <div class="flex bg-white/30 backdrop-blur-md rounded-2xl p-1.5 gap-1">
+                <button onclick="switchTab('motivation')" class="nav-tab active flex-1 py-3 rounded-xl font-medium text-sm text-gray-700 flex items-center justify-center gap-2">
+                    <span>💪</span> 励志
+                </button>
+                <button onclick="switchTab('tasks')" class="nav-tab flex-1 py-3 rounded-xl font-medium text-sm text-gray-700 flex items-center justify-center gap-2">
+                    <span>📝</span> 任务
+                </button>
+                <button onclick="switchTab('entertainment')" class="nav-tab flex-1 py-3 rounded-xl font-medium text-sm text-gray-700 flex items-center justify-center gap-2">
+                    <span>🎮</span> 娱乐
+                </button>
+            </div>
+        </div>
+
+        <!-- 励志模块 -->
+        <div id="motivation-tab" class="tab-content active">
+            <!-- 名言卡片 -->
+            <section class="max-w-2xl mx-auto mb-6">
+                <div class="card p-6 sm:p-8">
+                    <div class="quote-card rounded-2xl p-6 mb-6">
+                        <div class="text-4xl text-purple-400 mb-3">"</div>
+                        <p id="quote" class="text-lg sm:text-xl text-gray-700 leading-relaxed mb-4">
+                            成功不是终点，失败也不是终结。唯有继续前行的勇气，才是最重要的。
+                        </p>
+                        <p id="author" class="text-right text-purple-500 font-medium">—— 温斯顿·丘吉尔</p>
+                    </div>
+                    <div class="flex justify-center">
+                        <button onclick="nextQuote()" class="btn-gradient text-white px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2">
+                            <span>🔄</span> 换一句名言
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 今日进度 -->
+            <section class="max-w-2xl mx-auto mb-6">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                            <span class="text-2xl">📊</span> 今日完成度
+                        </h2>
+                        <span id="progressPercent" class="text-2xl font-bold text-purple-500">0%</span>
+                    </div>
+                    <div class="h-4 bg-gray-100 rounded-full overflow-hidden">
+                        <div id="progressBar" class="progress-bar h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-3">完成任务，解锁成就！💎</p>
+                </div>
+            </section>
+
+            <!-- 励志格言墙 -->
+            <section class="max-w-2xl mx-auto">
+                <h2 class="text-white font-bold text-xl mb-4 flex items-center gap-2">
+                    <span>💫</span> 每日金句
+                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="card p-4 text-center hover:scale-105 transition-transform cursor-pointer">
+                        <div class="text-3xl mb-2">🚀</div>
+                        <p class="text-gray-700 text-sm font-medium">千里之行<br/>始于足下</p>
+                    </div>
+                    <div class="card p-4 text-center hover:scale-105 transition-transform cursor-pointer">
+                        <div class="text-3xl mb-2">💎</div>
+                        <p class="text-gray-700 text-sm font-medium">天道酬勤<br/>厚德载物</p>
+                    </div>
+                    <div class="card p-4 text-center hover:scale-105 transition-transform cursor-pointer">
+                        <div class="text-3xl mb-2">🌟</div>
+                        <p class="text-gray-700 text-sm font-medium">求实创新<br/>艰苦奋斗</p>
+                    </div>
+                    <div class="card p-4 text-center hover:scale-105 transition-transform cursor-pointer">
+                        <div class="text-3xl mb-2">🔥</div>
+                        <p class="text-gray-700 text-sm font-medium">今日事<br/>今日毕</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 任务模块 -->
+        <div id="tasks-tab" class="tab-content">
+            <div class="max-w-2xl mx-auto space-y-6">
+                <!-- 今日事项 -->
+                <section class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                            <span class="text-2xl">☀️</span> 今日事项
+                        </h2>
+                        <span id="todayCount" class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">0 项</span>
+                    </div>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="todayInput" placeholder="添加今天要做的事..." 
+                               class="input-modern flex-1 px-4 py-3 rounded-xl text-sm text-gray-700"
+                               onkeypress="if(event.key==='Enter') addTask('today')">
+                        <button onclick="addTask('today')" 
+                                class="btn-gradient text-white px-5 py-3 rounded-xl font-bold text-lg">
+                            +
+                        </button>
+                    </div>
+
+                    <div id="todayTasks" class="space-y-3 max-h-72 overflow-y-auto">
+                        <div class="text-center text-gray-400 py-8">
+                            <div class="text-4xl mb-2">📋</div>
+                            <p class="text-sm">今天还没有安排任务哦~</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 明日计划 -->
+                <section class="card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                            <span class="text-2xl">🌙</span> 明日计划
+                        </h2>
+                        <span id="tomorrowCount" class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">0 项</span>
+                    </div>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="tomorrowInput" placeholder="规划明天要做的事..." 
+                               class="input-modern flex-1 px-4 py-3 rounded-xl text-sm text-gray-700"
+                               onkeypress="if(event.key==='Enter') addTask('tomorrow')">
+                        <button onclick="addTask('tomorrow')" 
+                                class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-5 py-3 rounded-xl font-bold text-lg hover:shadow-lg transition-all">
+                            +
+                        </button>
+                    </div>
+
+                    <div id="tomorrowTasks" class="space-y-3 max-h-72 overflow-y-auto">
+                        <div class="text-center text-gray-400 py-8">
+                            <div class="text-4xl mb-2">🌅</div>
+                            <p class="text-sm">规划明天，让生活更有条理~</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 娱乐模块 -->
+        <div id="entertainment-tab" class="tab-content">
+            <div class="max-w-2xl mx-auto">
+                <!-- B站入口 -->
+                <section class="card p-6 mb-6">
+                    <div class="text-center">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-pink-400 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                            <span class="text-4xl">📺</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800 mb-2">哔哩哔哩</h2>
+                        <p class="text-gray-500 text-sm mb-4">学习累了？来B站放松一下吧~</p>
+                        <a href="https://www.bilibili.com" target="_blank" 
+                           class="btn-bilibili inline-flex items-center gap-2 text-white px-8 py-3 rounded-full font-bold">
+                            <span>🎬</span> 进入B站
+                        </a>
+                    </div>
+                </section>
+
+                <!-- 快捷分类 -->
+                <h3 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                    <span>🎯</span> 快捷入口
+                </h3>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <a href="https://www.bilibili.com/v/knowledge" target="_blank" 
+                       class="entertainment-card card p-4 flex items-center gap-3 cursor-pointer">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <span class="text-2xl">📚</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">知识区</h4>
+                            <p class="text-xs text-gray-500">学习新知识</p>
+                        </div>
+                    </a>
+                    <a href="https://www.bilibili.com/v/tech" target="_blank" 
+                       class="entertainment-card card p-4 flex items-center gap-3 cursor-pointer">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <span class="text-2xl">💻</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">科技区</h4>
+                            <p class="text-xs text-gray-500">探索科技</p>
+                        </div>
+                    </a>
+                    <a href="https://www.bilibili.com/v/life" target="_blank" 
+                       class="entertainment-card card p-4 flex items-center gap-3 cursor-pointer">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <span class="text-2xl">🌻</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">生活区</h4>
+                            <p class="text-xs text-gray-500">生活日常</p>
+                        </div>
+                    </a>
+                    <a href="https://www.bilibili.com/v/music" target="_blank" 
+                       class="entertainment-card card p-4 flex items-center gap-3 cursor-pointer">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <span class="text-2xl">🎵</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">音乐区</h4>
+                            <p class="text-xs text-gray-500">听听音乐</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 推荐内容 -->
+                <h3 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                    <span>⭐</span> 学习推荐
+                </h3>
+                <div class="space-y-4">
+                    <a href="https://www.bilibili.com/video/BV1wy4y1D7JT" target="_blank" 
+                       class="entertainment-card card p-4 flex items-center gap-4 cursor-pointer">
+                        <div class="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <span class="text-3xl">🎓</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-800 truncate">大学生必看学习方法</h4>
+                            <p class="text-xs text-gray-500 mt-1">提高学习效率的秘诀</p>
+                        </div>
+                        <span class="text-pink-500 text-xl">→</span>
+                    </a>
+                    <a href="https://www.bilibili.com/video/BV1XJ411n7tU" target="_blank" 
+                       class="entertainment-card card p-4 flex items-center gap-4 cursor-pointer">
+                        <div class="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <span class="text-3xl">💡</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-800 truncate">时间管理技巧</h4>
+                            <p class="text-xs text-gray-500 mt-1">让每一天都更有价值</p>
+                        </div>
+                        <span class="text-blue-500 text-xl">→</span>
+                    </a>
+                    <a href="https://www.bilibili.com/video/BV1ob411r7bY" target="_blank" 
+                       class="entertainment-card card p-4 flex items-center gap-4 cursor-pointer">
+                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <span class="text-3xl">🏃</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-800 truncate">自律改变人生</h4>
+                            <p class="text-xs text-gray-500 mt-1">励志视频合集</p>
+                        </div>
+                        <span class="text-orange-500 text-xl">→</span>
+                    </a>
+                </div>
+
+                <!-- 休闲放松 -->
+                <h3 class="text-white font-bold text-lg mb-4 mt-6 flex items-center gap-2">
+                    <span>🎮</span> 休闲放松
+                </h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <a href="https://www.bilibili.com/v/game" target="_blank" 
+                       class="card p-4 text-center hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🎮</div>
+                        <p class="text-gray-700 text-xs font-medium">游戏</p>
+                    </a>
+                    <a href="https://www.bilibili.com/v/dance" target="_blank" 
+                       class="card p-4 text-center hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">💃</div>
+                        <p class="text-gray-700 text-xs font-medium">舞蹈</p>
+                    </a>
+                    <a href="https://www.bilibili.com/v/food" target="_blank" 
+                       class="card p-4 text-center hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🍔</div>
+                        <p class="text-gray-700 text-xs font-medium">美食</p>
+                    </a>
+                    <a href="https://www.bilibili.com/v/animal" target="_blank" 
+                       class="card p-4 text-center hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🐱</div>
+                        <p class="text-gray-700 text-xs font-medium">萌宠</p>
+                    </a>
+                    <a href="https://www.bilibili.com/v/sports" target="_blank" 
+                       class="card p-4 text-center hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">⚽</div>
+                        <p class="text-gray-700 text-xs font-medium">运动</p>
+                    </a>
+                    <a href="https://www.bilibili.com/v/fashion" target="_blank" 
+                       class="card p-4 text-center hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">👗</div>
+                        <p class="text-gray-700 text-xs font-medium">时尚</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="text-center text-white/70 pt-8 mt-8">
+            <div class="flex justify-center gap-4 mb-4">
+                <a href="https://www.tyut.edu.cn" target="_blank" 
+                   class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+                    <span>🏫</span> 太原理工大学
+                </a>
+                <a href="https://www.bilibili.com" target="_blank" 
+                   class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-sm hover:bg-white/30 transition-all flex items-center gap-2">
+                    <span>📺</span> 哔哩哔哩
+                </a>
+            </div>
+            <p class="text-sm">Made with ❤️ | 每天进步一点点 🌈</p>
+        </footer>
+    </div>
+
+    <script>
+        // 名言数据
+        const quotes = [
+            { text: "成功不是终点，失败也不是终结。唯有继续前行的勇气，才是最重要的。", author: "温斯顿·丘吉尔" },
+            { text: "不要等待机会，而要创造机会。", author: "林肯" },
+            { text: "你的时间有限，不要浪费在别人的生活里。", author: "史蒂夫·乔布斯" },
+            { text: "没有人可以回到过去重新开始，但每个人都可以从现在开始创造全新的未来。", author: "玛丽亚·罗宾逊" },
+            { text: "当你觉得为时已晚的时候，恰恰是最早的时候。", author: "哈佛校训" },
+            { text: "求实创新，艰苦奋斗。", author: "太原理工大学校训" },
+            { text: "宝剑锋从磨砺出，梅花香自苦寒来。", author: "古训" },
+            { text: "天行健，君子以自强不息。", author: "周易" },
+            { text: "路漫漫其修远兮，吾将上下而求索。", author: "屈原" },
+            { text: "生活不是等待暴风雨过去，而是学会在雨中跳舞。", author: "维维安·格林" }
+        ];
+
+        let currentQuoteIndex = 0;
+        let todayTasks = [];
+        let tomorrowTasks = [];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTasks();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            createCircles();
+            updateGreeting();
+            setInterval(nextQuote, 12000);
+        });
+
+        // 更新问候语
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = '';
+            if (hour < 6) greeting = '夜深了，注意休息哦~ 🌙';
+            else if (hour < 9) greeting = '早上好！新的一天开始啦~ ☀️';
+            else if (hour < 12) greeting = '上午好！保持专注，继续加油~ 💪';
+            else if (hour < 14) greeting = '中午好！记得吃午饭休息一下~ 🍱';
+            else if (hour < 18) greeting = '下午好！下午茶时间到~ ☕';
+            else if (hour < 22) greeting = '晚上好！今天辛苦了~ 🌆';
+            else greeting = '夜深了，早点休息吧~ 🌙';
+            document.getElementById('greeting').textContent = greeting;
+        }
+
+        // 更新日期时间
+        function updateDateTime() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            const time = now.toLocaleTimeString('zh-CN');
+            document.getElementById('dateTime').textContent = now.toLocaleDateString('zh-CN', options) + ' ' + time;
+        }
+
+        // 切换标签
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.closest('.nav-tab').classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // 切换名言
+        function nextQuote() {
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+            const quote = quotes[currentQuoteIndex];
+            
+            const quoteEl = document.getElementById('quote');
+            const authorEl = document.getElementById('author');
+            
+            quoteEl.style.opacity = 0;
+            authorEl.style.opacity = 0;
+            
+            setTimeout(() => {
+                quoteEl.textContent = quote.text;
+                authorEl.textContent = '—— ' + quote.author;
+                quoteEl.style.opacity = 1;
+                authorEl.style.opacity = 1;
+            }, 300);
+        }
+
+        // 添加任务
+        function addTask(type) {
+            const input = document.getElementById(type + 'Input');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            const task = {
+                id: Date.now(),
+                text: text,
+                completed: false
+            };
+            
+            if (type === 'today') {
+                todayTasks.push(task);
+            } else {
+                tomorrowTasks.push(task);
+            }
+            
+            input.value = '';
+            saveTasks();
+            renderTasks();
+        }
+
+        // 切换任务状态
+        function toggleTask(type, id) {
+            const tasks = type === 'today' ? todayTasks : tomorrowTasks;
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                if (task.completed && type === 'today') {
+                    createConfetti();
+                }
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // 删除任务
+        function deleteTask(type, id) {
+            if (type === 'today') {
+                todayTasks = todayTasks.filter(t => t.id !== id);
+            } else {
+                tomorrowTasks = tomorrowTasks.filter(t => t.id !== id);
+            }
+            saveTasks();
+            renderTasks();
+        }
+
+        // 渲染任务
+        function renderTasks() {
+            renderTaskList('today', todayTasks);
+            renderTaskList('tomorrow', tomorrowTasks);
+            updateProgress();
+        }
+
+        function renderTaskList(type, tasks) {
+            const container = document.getElementById(type + 'Tasks');
+            const countEl = document.getElementById(type + 'Count');
+            const completedCount = tasks.filter(t => t.completed).length;
+            
+            countEl.textContent = `${completedCount}/${tasks.length} 项`;
+            
+            if (tasks.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <div class="text-4xl mb-2">${type === 'today' ? '📋' : '🌅'}</div>
+                        <p class="text-sm">${type === 'today' ? '今天还没有安排任务哦~' : '规划明天，让生活更有条理~'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = tasks.map(task => `
+                <div class="task-item flex items-center gap-3 p-3 rounded-xl ${task.completed ? 'bg-gray-50' : 'bg-purple-50'} group">
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                           onchange="toggleTask('${type}', ${task.id})"
+                           class="checkbox-modern">
+                    <span class="flex-1 text-sm ${task.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${escapeHtml(task.text)}</span>
+                    <button onclick="deleteTask('${type}', ${task.id})" 
+                            class="delete-btn w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition-colors">
+                        ×
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const total = todayTasks.length;
+            const completed = todayTasks.filter(t => t.completed).length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressPercent').textContent = percentage + '%';
+        }
+
+        // 保存任务
+        function saveTasks() {
+            localStorage.setItem('todayTasks', JSON.stringify(todayTasks));
+            localStorage.setItem('tomorrowTasks', JSON.stringify(tomorrowTasks));
+            localStorage.setItem('lastSaveDate', new Date().toDateString());
+        }
+
+        // 加载任务
+        function loadTasks() {
+            const lastSaveDate = localStorage.getItem('lastSaveDate');
+            const today = new Date().toDateString();
+            
+            if (lastSaveDate && lastSaveDate !== today) {
+                const savedTomorrow = localStorage.getItem('tomorrowTasks');
+                if (savedTomorrow) {
+                    todayTasks = JSON.parse(savedTomorrow).map(t => ({...t, completed: false}));
+                }
+                tomorrowTasks = [];
+            } else {
+                const savedToday = localStorage.getItem('todayTasks');
+                const savedTomorrow = localStorage.getItem('tomorrowTasks');
+                
+                if (savedToday) todayTasks = JSON.parse(savedToday);
+                if (savedTomorrow) tomorrowTasks = JSON.parse(savedTomorrow);
+            }
+            
+            saveTasks();
+            renderTasks();
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 创建彩色粒子
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        left: ${Math.random() * 100}vw;
+                        top: -20px;
+                        width: ${Math.random() * 12 + 6}px;
+                        height: ${Math.random() * 12 + 6}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                        pointer-events: none;
+                        z-index: 1000;
+                        animation: confettiFall 3s ease-out forwards;
+                    `;
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes confettiFall {
+                to {
+                    transform: translateY(110vh) rotate(720deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 创建装饰圆圈
+        function createCircles() {
+            const container = document.getElementById('circles');
+            for (let i = 0; i < 10; i++) {
+                const circle = document.createElement('div');
+                circle.className = 'circle';
+                const size = Math.random() * 100 + 50;
+                circle.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${Math.random() * 100}vw;
+                    top: ${Math.random() * 100}vh;
+                    animation-delay: ${Math.random() * 5}s;
+                `;
+                container.appendChild(circle);
+            }
+        }
+
+        // 过渡效果
+        document.getElementById('quote').style.transition = 'opacity 0.3s ease';
+        document.getElementById('author').style.transition = 'opacity 0.3s ease';
+
+        console.log('%c🌈 欢迎使用生活助手！', 'font-size: 20px; color: #667eea; font-weight: bold;');
+        console.log('%c太原理工大学 - 求实创新，艰苦奋斗', 'font-size: 14px; color: #764ba2;');
+    </script>
+</body>
+</html>
